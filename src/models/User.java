@@ -58,11 +58,12 @@ public class User {
 	public static boolean checkUserAvailability(String email)
 			throws SQLException {
 		Connection conn = com.services.DBConnection.getActiveConnection();
-		String sql = "Select * from user where `Mail` = ? ";
+		String sql = "Select * from kaputo.User where `Mail` = ? ";
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
 		stmt.setString(1, email);
 		ResultSet rs = stmt.executeQuery();
+
 		if (rs.next()) {
 			return true;
 		}
@@ -74,10 +75,13 @@ public class User {
 			String phone) throws SQLException {
 
 		if (checkUserAvailability(email)) {
+
+			System.out.println("no problem");
+
 			return null;
 		}
 		Connection conn = com.services.DBConnection.getActiveConnection();
-		String sql = "insert into Kaputo.user (`Mail` , `Name`, `Password`,`Phone` ) VALUES( ? , ? , ? , ?) ;";
+		String sql = "insert into User (`Mail` , `Name`, `Password`,`Phone` ) VALUES( ? , ? , ? , ?) ;";
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		stmt.setString(1, email);
@@ -98,22 +102,47 @@ public class User {
 	public static User login(String email, String password) throws SQLException {
 
 		Connection conn = com.services.DBConnection.getActiveConnection();
-		String sql = "Select * from user where `Mail` = ? and `Password` = ?";
+		String sql = "Select * from User where `Mail` = ? and `Password` = ?";
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
 		stmt.setString(1, email);
 		stmt.setString(2, password);
 		ResultSet rs = stmt.executeQuery();
 		if (rs.next()) {
+
 			User user = new User();
 			user.email = rs.getString("Mail");
 			user.name = rs.getString("Name");
 			user.password = rs.getString("Password");
 			user.phone = rs.getString("Phone");
-			
+
 			return user;
 		}
 		return null;
+	}
+
+	public static User updateUserInfo(String email, String name,
+			String password, String phone) throws SQLException {
+		if (!checkUserAvailability(email)) {
+			return null;
+		}
+		Connection conn = com.services.DBConnection.getActiveConnection();
+		String sql = "UPDATE User SET `Name` = ?, `Password` = ?, `Phone`=? WHERE `Mail`=?;";
+		PreparedStatement stmt;
+		stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		stmt.setString(1, name);
+		stmt.setString(2, password);
+		stmt.setString(3, phone);
+		stmt.setString(4, email);
+		stmt.executeUpdate();
+		ResultSet rs = stmt.getGeneratedKeys();
+		if (rs.next()) {
+			System.out.println("TNT");
+		}
+		User user = new User(email, name, password, phone);
+
+		return user;
+
 	}
 
 }

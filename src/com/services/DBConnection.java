@@ -8,16 +8,20 @@ public class DBConnection {
 	private static Connection connection = null;
 
 	public static Connection getActiveConnection() {
-		/*
-		 * String host = System.getenv("OPENSHIFT_MYSQL_DB_HOST"); String port =
-		 * System.getenv("OPENSHIFT_MYSQL_DB_PORT"); System.out.println(host);
-		 */
 
 		try {
+
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager
 					.getConnection("jdbc:mysql://localhost:3306/kaputo?"
 							+ "user=root&password=1234&characterEncoding=utf8");
+			/*
+			 * Class.forName("com.mysql.jdbc.Driver"); connection =
+			 * DriverManager
+			 * .getConnection("jdbc:mysql://127.11.21.130:3306/kaputo?" +
+			 * "user=adminDpGxqEN&password=XJvaKtEZ3DKb&characterEncoding=utf8"
+			 * );
+			 */
 			return connection;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
